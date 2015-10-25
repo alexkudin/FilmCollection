@@ -81,9 +81,8 @@ public class FilmCollection //extends ArrayList
                                 }                                                        
                             }
                             
-                            Janres.add(new Janr(j));
-                            List.add(new Film(n,y,j));
-                            janrIsFound = true;
+                            Janres.add(new Janr(j));                        
+                            
                             try
                             {
                                 List.add(new Film(n,y,j));                                        
@@ -91,7 +90,8 @@ public class FilmCollection //extends ArrayList
                             catch(Exception e)
                             {
                                 System.out.println("Error creating object Film : " + e.getMessage());
-                            }     
+                            }    
+                            janrIsFound = true;
                         }
                                                
                    break;
@@ -236,14 +236,14 @@ class Film
     }
     public String setName(String s) throws Exception
     {
-        if(s.isEmpty() != false)
+        if(s.isEmpty())
         {
-            this.Filmname = s;
-            return this.Filmname;
+            throw new Exception("Film Name can not be empty! ");           
         }
         else
         {
-            throw new Exception("Film Name can not be empty! ");            
+           this.Filmname = s;
+           return this.Filmname;            
         }
     }
     public int setYear(int y) throws Exception
@@ -275,14 +275,14 @@ class Janr
     }
     public String setJanrName(String j) throws Exception
     {
-        if(j.isEmpty() != false)
+        if(j.isEmpty())
         {
-            this.JanrName = j;
-            return this.JanrName;
+            throw new Exception("Film Janr can not be empty! ");            
         }
         else
         {
-            throw new Exception("Film Name can not be empty! ");            
+            this.JanrName = j;
+            return this.JanrName;              
         }
     }
     public String getJanr()
