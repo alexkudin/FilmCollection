@@ -58,6 +58,7 @@ public class FilmCollection extends ArrayList<Film> implements Serializable
     {
         FilmCollection List = new FilmCollection();
         JanrCollection Janres = new JanrCollection();
+        
         Janr a = new Janr("action");
         Janr f = new Janr("fantastic");
         Janr s = new Janr("serial");
@@ -226,7 +227,7 @@ public class FilmCollection extends ArrayList<Film> implements Serializable
                         int submenu;
                         do
                             {
-                                System.out.println ("Edit Janres :  1) Show All Janres  2) Add 3) Remove  4) Replace  5) Quit To Main Menu ");
+                                System.out.println ("Edit Janres : 1) Show All Janres 2) Add 3) Remove 4) Replace 5) Quit To Main Menu ");
                                 submenu =  getInt();
                                 switch(submenu)
                                 {
@@ -237,48 +238,75 @@ public class FilmCollection extends ArrayList<Film> implements Serializable
                                         
                                     break;
                                     
-//</editor-fold>
+//</editor-fold>                                    
+                                    //<editor-fold defaultstate="collapsed" desc="2) Add Janr">
                                     
+                                    case (2):                 
+
+                                        System.out.println("Enter Janr Name : ");
+                                        String newjanr = getString();
                                         
-//                                    case (2):     // Add Janr             
-//
-//                                        System.out.println("Enter Janr Name : ");
-//                                        Janr newjanr  = new Janr(getString());
-//                                        if(Janres.contains(newjanr))
-//                                        {                                 
-//                                            System.out.println(newjanr.getJanr() + " is Exist");
-//                                        }
-//                                        else
-//                                        {
-//                                            Janres.add(newjanr);
-//                                        }
-//                                    break;
+                                        if(Janres.janrIsExist(newjanr) == true)
+                                        {
+                                            System.out.println("This Janr is Exist in Collection.");
+                                        }
+                                        else
+                                        {
+                                            Janres.add(new Janr(newjanr));
+                                        }
+                                                                               
+                                    break;
+//</editor-fold>
+                                    //<editor-fold defaultstate="collapsed" desc="3) Remove Janr">
+                                   
+                                    case (3):    
 
-                                    case (3):     // Remove Janr
-
-                                        System.out.println("Enter the index of Janr what you want to remove :  ");
+                                        System.out.println("Enter index of Janr what you want to remove :  ");
                                         Janres.showAllJanres();
-                                        int r = getInt();
-                                        Janres.remove(r-1);
+                                        
+                                        int re = getInt();
+                                        String S = Janres.get(re-1).JanrName;
+                                        
+                                        Iterator F = List.iterator();
+                                        while(F.hasNext())
+                                        {
+                                            Film x =  (Film) F.next();
+                                            
+                                            if(x.j.JanrName.indexOf(S) >= 0)
+                                            {
+                                                System.out.println("This Janr Used by one or more Film(s) in FilmList and cannot be Delete");
+                                                break;
+                                            }
+                                            else
+                                            {
+                                                //int remove = re - 1;
+                                                Janres.remove(Janres.get(re-1));                                                
+                                            }
+                                            
+                                        }
+                                        
                                         System.out.println("New List of Janres : ");
                                         Janres.showAllJanres();
                                         
                                     break;
+//</editor-fold>                                        
                                         
-                                    case (4):     // Replace Janr
+                                    //<editor-fold defaultstate="collapsed" desc="4) Replace Janr">
+                                        
+
+                                    case (4):    
 
                                         Janres.showAllJanres();
                                         System.out.println("Enter the index of Janr what you want to Replace :  ");
                                         int rpl = getInt();
                                         Janres.remove(rpl-1);
                                         System.out.println("Enter a New Janr : ");
-                                        Janres.add(rpl-1, new Janr(getString()));
-                                    //    
+                                        Janres.add(rpl-1, new Janr(getString()));                                      
                                         System.out.println("New List of Janres : ");
                                         Janres.showAllJanres();
                                         
                                     break;
-                                        
+//</editor-fold>                                   
                                     //<editor-fold defaultstate="collapsed" desc="5) Quit to Main Menu">
                                     case (5):    
                                         
@@ -286,13 +314,10 @@ public class FilmCollection extends ArrayList<Film> implements Serializable
                                                                           
                                     break; 
                                         
-//</editor-fold>
-                                                                           
+//</editor-fold>                                                                           
                                 }
                             }
-                        while (submenu !=5);
-
-                            
+                        while (submenu !=5);                            
                             
                    break;
                        //</editor-fold>
@@ -323,7 +348,7 @@ public class FilmCollection extends ArrayList<Film> implements Serializable
     
 }
 
-class Film
+class Film implements Serializable
 {
     public String Filmname;
     public int year;
@@ -362,11 +387,15 @@ class Film
     public void showFilm()
     {
         System.out.println(this.Filmname + ", Year : " + this.year + ", Janr : " + j.getJanr() + ".");
-    }   
+    } 
+    public String getJanr()
+    {        
+        return this.j.getJanr();
+    }
 }
 
 
-class Janr
+class Janr implements Serializable
 {
     public String JanrName;   
     
@@ -416,5 +445,35 @@ class JanrCollection extends ArrayList<Janr>
             }        
     }
     
+    public boolean janrIsExist(String S) 
+    {
+        boolean Exist = false;
+        Iterator N = this.iterator();
+        while(N.hasNext())
+        {
+            Janr x =  (Janr) N.next();
+            if(x.getJanr().indexOf(S) >= 0)
+            {
+                Exist = true;
+                break;                                                   
+            }                                                        
+        }
+
+//        if(Exist == false)
+//        {
+//            Janr newjanr = new Janr(S); 
+//            try
+//            {
+//                this.add(newjanr);                                                 
+//            }
+//            catch(Exception e)
+//            {
+//                System.out.println("Error creating object Janr : " + e.getMessage());
+//            }    
+//            Exist = true;
+//        }     
+        
+        return Exist;
+    }  
     
 }
