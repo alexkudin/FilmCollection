@@ -327,7 +327,7 @@ public class FilmCollection extends ArrayList<Film> implements Serializable
                                             if(x.j.JanrName.indexOf(S) >= 0)
                                             {
                                                 System.out.println("This Janr Used by one or more Film(s) in FilmList and cannot be Delete");
-                                                break;
+                                                //break;
                                             }
                                             else
                                             {
@@ -386,6 +386,7 @@ public class FilmCollection extends ArrayList<Film> implements Serializable
                        
                         System.out.println("Good Bye !");
                         List.writeFile();
+                        
                    break;  
                        //</editor-fold>
             }       
