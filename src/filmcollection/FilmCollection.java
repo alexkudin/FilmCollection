@@ -1,7 +1,11 @@
 package filmcollection;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -25,8 +29,24 @@ public class FilmCollection extends ArrayList<Film> implements Serializable
                 i++;
             }        
     }
-     
     
+    public void writeFile() throws Exception
+    {
+        try
+        {
+            ObjectOutputStream  OOS = new ObjectOutputStream (new FileOutputStream ("films.dat"));
+            for (Film f: this)
+            {
+                OOS.writeObject(f);
+                OOS.writeObject((Janr)f.j);
+            }
+            OOS.close();
+        }
+        catch (Exception e)
+        {
+            System.out.println("Error writing to File : " + e.getMessage());
+        }
+    }    
     
     public static String getString()
     {        
@@ -56,24 +76,56 @@ public class FilmCollection extends ArrayList<Film> implements Serializable
     
     public static void main(String[] args) throws Exception 
     {
-        FilmCollection List = new FilmCollection();
-        JanrCollection Janres = new JanrCollection();
+        FilmCollection List     = new FilmCollection();
+        JanrCollection Janres   = new JanrCollection();
         
-        Janr a = new Janr("action");
-        Janr f = new Janr("fantastic");
-        Janr s = new Janr("serial");
-        Janr d = new Janr("drama");
-        Janres.add(a);
-        Janres.add(f);
-        Janres.add(s);
-        Janres.add(d);        
-                
-        List.add(new Film("Rembo" ,         1972 , a));
-        List.add(new Film("Star Wars" ,     1974 , f));
-        List.add(new Film("Die Hard" ,      1986 , a));
-        List.add(new Film("Lost" ,          2004 , s));
-        List.add(new Film("Terminator 2" ,  1992 , a));
-        List.add(new Film("Titanik" ,       2000 , d));
+//        Janr a = new Janr("action");
+//        Janr f = new Janr("fantastic");
+//        Janr s = new Janr("serial");
+//        Janr d = new Janr("drama");
+//        Janres.add(a);
+//        Janres.add(f);
+//        Janres.add(s);
+//        Janres.add(d);        
+//                
+//        List.add(new Film("Rembo" ,         1972 , a));
+//        List.add(new Film("Star Wars" ,     1974 , f));
+//        List.add(new Film("Die Hard" ,      1986 , a));
+//        List.add(new Film("Lost" ,          2004 , s));
+//        List.add(new Film("Terminator 2" ,  1992 , a));
+//        List.add(new Film("Titanik" ,       2000 , d));
+        
+            try
+            {
+                FileInputStream   FIS   = new FileInputStream("films.dat");
+                ObjectInputStream OIS   = new ObjectInputStream(FIS);
+
+                while(FIS.available() > 0)
+                {
+                    Object obj = OIS.readObject();
+                    if(obj instanceof Film)
+                    {
+                        List.add((Film)obj);
+                    }
+                    else
+                    if(obj instanceof Janr)
+                    {
+                        if(Janres.janrIsExist((Janr)obj) == false)
+                        {
+                            Janres.add((Janr)obj);
+                        }
+                    }
+                    else
+                    {
+                        System.out.println("object not initialised " + obj.getClass().getName()); 
+                    }                   
+                }
+                OIS.close();
+            }
+            catch(Exception e)
+            {
+                System.out.println("Error : " + e.getMessage());
+            }
         
         
         int m;
@@ -289,8 +341,7 @@ public class FilmCollection extends ArrayList<Film> implements Serializable
                                         Janres.showAllJanres();
                                         
                                     break;
-//</editor-fold>                                        
-                                        
+//</editor-fold>                                    
                                     //<editor-fold defaultstate="collapsed" desc="4) Replace Janr">
                                         
 
@@ -320,7 +371,7 @@ public class FilmCollection extends ArrayList<Film> implements Serializable
                         while (submenu !=5);                            
                             
                    break;
-                       //</editor-fold>
+//</editor-fold>
                     //<editor-fold defaultstate="collapsed" desc="5 : Print All">                       
 
                    case (5):   //  
@@ -334,18 +385,13 @@ public class FilmCollection extends ArrayList<Film> implements Serializable
                    case (6):
                        
                         System.out.println("Good Bye !");
-                        //List.writeFile();
+                        List.writeFile();
                    break;  
                        //</editor-fold>
             }       
         }
-        while(m !=6);
-        
-        
-        //Newlist ListFromFile = Firma.readFile();
-       
-    }
-    
+        while(m !=6);       
+    }    
 }
 
 class Film implements Serializable
@@ -458,22 +504,24 @@ class JanrCollection extends ArrayList<Janr>
                 break;                                                   
             }                                                        
         }
-
-//        if(Exist == false)
-//        {
-//            Janr newjanr = new Janr(S); 
-//            try
-//            {
-//                this.add(newjanr);                                                 
-//            }
-//            catch(Exception e)
-//            {
-//                System.out.println("Error creating object Janr : " + e.getMessage());
-//            }    
-//            Exist = true;
-//        }     
         
         return Exist;
     }  
     
+    public boolean janrIsExist(Janr j) 
+    {
+        boolean Exist = false;
+        Iterator N = this.iterator();
+        while(N.hasNext())
+        {
+            Janr x =  (Janr) N.next();
+            if(x.getJanr().indexOf(j.getJanr()) >= 0)
+            {
+                Exist = true;
+                break;                                                   
+            }                                                        
+        }   
+        
+        return Exist;
+    }    
 }
