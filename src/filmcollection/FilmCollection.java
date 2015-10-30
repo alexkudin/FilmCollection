@@ -2,11 +2,32 @@ package filmcollection;
 
 import java.io.InputStreamReader;
 import java.io.LineNumberReader;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-public class FilmCollection //extends ArrayList 
+public class FilmCollection extends ArrayList<Film> implements Serializable
 {
+    FilmCollection()
+    {
+        
+    }
+    
+    public void showAllFilms()
+    {
+        int i = 1;
+        Iterator I = this.iterator();
+            while(I.hasNext())
+            {
+                Film x =  (Film) I.next();
+                System.out.print(i + " : "); 
+                x.showFilm();
+                i++;
+            }        
+    }
+     
+    
+    
     public static String getString()
     {        
         String              S   = "";
@@ -35,57 +56,76 @@ public class FilmCollection //extends ArrayList
     
     public static void main(String[] args) throws Exception 
     {
-        ArrayList<Film> List = new ArrayList<>();
-        ArrayList<Janr> Janres = new ArrayList<>();
+        FilmCollection List = new FilmCollection();
+        JanrCollection Janres = new JanrCollection();
+        Janr a = new Janr("action");
+        Janr f = new Janr("fantastic");
+        Janr s = new Janr("serial");
+        Janr d = new Janr("drama");
+        Janres.add(a);
+        Janres.add(f);
+        Janres.add(s);
+        Janres.add(d);        
+                
+        List.add(new Film("Rembo" ,         1972 , a));
+        List.add(new Film("Star Wars" ,     1974 , f));
+        List.add(new Film("Die Hard" ,      1986 , a));
+        List.add(new Film("Lost" ,          2004 , s));
+        List.add(new Film("Terminator 2" ,  1992 , a));
+        List.add(new Film("Titanik" ,       2000 , d));
+        
         
         int m;
         
         do
         {
-            System.out.println("1) Add Film \n2) Remove Film \n3) Edit Film \n4) Print All Films  \n5) Edit Janres \n6) Save & Exit Menu ");  
+            System.out.println("1) Add Film \n2) Remove Film \n3) Edit Film \n4) Edit Janres  \n5) Print All Films \n6) Save & Exit Menu ");  
             m = getInt(); 
                 switch(m)
                 {
-                   case (1):   // Add New Film                                      
+                    
+                    //<editor-fold defaultstate="collapsed" desc="1 : Add New Film">                    
+
+                   case (1):                                          
 
                         System.out.println("Enter Film Name : ");
-                        String n  = getString();
+                        String  n  = getString();
                         System.out.println("Enter Film Year : ");
-                        int y     = getInt();
-                        System.out.println("Janres of Film : ");
+                        int     y  = getInt();
+                        System.out.println("Janres of Films : ");               // Show all Available Janres Of Films
+                        Janres.showAllJanres();
+                        System.out.println("Enter JanrName : ");                // Create New Janr if this not Available
+                        String  j = getString();
+                        
+                        boolean janrIsFound = false;                        
+
                         Iterator I = Janres.iterator();
                         while(I.hasNext())
                         {
                             Janr x =  (Janr) I.next();
-                            x.showJanr();
-                        }
-                        System.out.println("Enter JanrName : ");
-                        String j  = getString();
-                        boolean janrIsFound = false;
-                        while(janrIsFound == false)
-                        {
-                            while(I.hasNext())
+                            if(x.getJanr().indexOf(j) >= 0)
                             {
-                                Janr x =  (Janr) I.next();
-                                if(x.getJanr() == j)
+                                try
                                 {
+                                    System.out.println("This Janr is Exist");
+                                    List.add(new Film(n,y,x)); 
                                     janrIsFound = true;
-                                    try
-                                    {
-                                        List.add(new Film(n,y,j));                                        
-                                    }
-                                    catch(Exception e)
-                                    {
-                                        System.out.println("Error creating object Film : " + e.getMessage());
-                                    }                                    
-                                }                                                        
-                            }
-                            
-                            Janres.add(new Janr(j));                        
-                            
+                                    break;
+                                }
+                                catch(Exception e)
+                                {
+                                    System.out.println("Error creating object Film : " + e.getMessage());
+                                }                                    
+                            }                                                        
+                        }
+                        
+                        if(janrIsFound == false)
+                        {
+                            Janr newjanr = new Janr(j);                        
+                            Janres.add(newjanr);
                             try
                             {
-                                List.add(new Film(n,y,j));                                        
+                                List.add(new Film(n,y,newjanr));                                        
                             }
                             catch(Exception e)
                             {
@@ -93,124 +133,185 @@ public class FilmCollection //extends ArrayList
                             }    
                             janrIsFound = true;
                         }
-                                               
+                                                
                    break;
+                       
+                    //</editor-fold>
+                    //<editor-fold defaultstate="collapsed" desc="2 : Remove Film ">                     
 
+                   case (2):     
+                       
+                        System.out.println("Enter the index of Film what you want to Remove : ");
+                        List.showAllFilms();
+                        int removeIndex = getInt(); 
+                        List.remove(removeIndex-1);
+                        System.out.println("New List of Films : ");
+                        List.showAllFilms();
+                        //List.writeFile();
+                   break;
+                       
+                    //</editor-fold> 
+                    //<editor-fold defaultstate="collapsed" desc="3 : Edit Film">
+                   
+                   case (3):   // Edit Film       
+                        int exchange;
+                        List.showAllFilms();                        
+                        do
+                            {      
+                                System.out.println ("Enter the index of Film what you want to Edit :  ");
+                                exchange = getInt();
+                            }
+                        while (exchange < 0  &&  exchange > List.size());  
 
-//                   case (2):   // Remove human  
-//                       
-//                        System.out.println("Enter the index of Human Whom you want to Remove : ");
-//                        ListFromFile.Editedlist();
-//                        int re = getInt(); 
-//                        ListFromFile.remove(re-1);
+                        Film old = (Film) List.get(exchange-1);                 // Save Old Profile
+                        List.remove(exchange-1);                                // Remove Old profile
+                        System.out.println ("enter new Film Name : ");
+                        String nameEx = getString();
+                        System.out.println ("enter new Film Year : ");
+                        int yearEx = getInt();                                             
+                        System.out.println("Janres of Films : ");               // Show all Available Janres Of Films
+                        Janres.showAllJanres();
+                        System.out.println("Enter Janr Name : ");                                      
+                        String newj  = getString();   
+                        
+                        boolean Janr_is_Found = false;                        
+
+                        Iterator J = Janres.iterator();
+                        while(J.hasNext())
+                        {
+                            Janr ex =  (Janr) J.next();
+                            if(ex.getJanr().indexOf(newj) >= 0)
+                            {
+                                try
+                                {
+                                    System.out.println("This Janr is Exist");
+                                    List.add(exchange-1, new Film(nameEx,yearEx,ex)); 
+                                    Janr_is_Found = true;
+                                    break;
+                                }
+                                catch(Exception e)
+                                {
+                                    System.out.println("Error Editing Film : " + e.getMessage());
+                                    List.add(exchange-1, old);                  // return Old Profile if Exception 
+                                }                                    
+                            }                                                        
+                        }
+                        
+                        if(Janr_is_Found == false)
+                        {
+                            Janr newjanr = new Janr(newj);                        
+                            Janres.add(newjanr);
+                            try
+                            {
+                                List.add(exchange-1,new Film(nameEx,yearEx,newjanr));                                        
+                            }
+                            catch(Exception e)
+                            {
+                                System.out.println("Error Editing Film : " + e.getMessage());
+                                List.add(exchange-1, old);                      // return Old Profile if Exception 
+                            }    
+                            Janr_is_Found = true;
+                        }                       
+
+                        System.out.println("New List of Films : ");
+                        List.showAllFilms();
+
+                   break; 
+                       
+                    //</editor-fold>
+                    //<editor-fold defaultstate="collapsed" desc="4 : Edit Janres / SubMenu">
+                    
+                   case (4):   
+
+                        int submenu;
+                        do
+                            {
+                                System.out.println ("Edit Janres :  1) Show All Janres  2) Add 3) Remove  4) Replace  5) Quit To Main Menu ");
+                                submenu =  getInt();
+                                switch(submenu)
+                                {
+                                    //<editor-fold defaultstate="collapsed" desc="1) Show All Janres">
+                                    case (1):    // 
+                                        
+                                        Janres.showAllJanres();   
+                                        
+                                    break;
+                                    
+//</editor-fold>
+                                    
+                                        
+//                                    case (2):     // Add Janr             
 //
-//                        System.out.println("New List of Humans : ");
-//                        ListFromFile.Editedlist();
-//                        ListFromFile.writeFile();
-//                   break;
-//
-//                   case (3):   // Edit profile                      
-//
-//                        int exchange;
-//                        ListFromFile.Editedlist();
-//                        do
-//                            {      
-//                                System.out.println ("Enter the index of Human Whom you want to Edit :  ");
-//                                exchange = getInt();
-//                            }
-//                        while (exchange < 0  &&  exchange > ListFromFile.size());  
-//
-//                        Human old = ListFromFile.get(exchange-1);                                // Save Old Profile
-//                        ListFromFile.remove(exchange-1);                                             // Remove Old profile
-//
-//                        System.out.println ("enter Name : ");
-//                        String nameEx = getString();
-//                        System.out.println("enter Family : ");
-//                        String famEx = getString();
-//                        System.out.println ("enter Age : ");
-//                        int ageEx = getInt();
-//                        System.out.println ("enter Position : ");
-//                        int posEx = getInt();
-//
-//                        try
-//                            {
-//                                Human ex = new Human (nameEx, famEx, ageEx, posEx);    
-//                                ListFromFile.add(exchange-1, ex);                                    // Add New Edited Profile
-//                            }
-//                        catch(Exception e)
-//                            {
-//                                System.out.println("Error : " + e.getMessage());
-//                                ListFromFile.add(exchange-1, old);                                  // return Old Profile if Exception 
-//                            }            
-//
-//                        System.out.println("List of Humans : ");
-//                        ListFromFile.Editedlist();
-//                        ListFromFile.writeFile();
-//                   break; 
-//
-//                   case (4):   // Search Human
-//
-//                        int subm;
-//                        do
-//                            {
-//                                System.out.println ("Search :  1) Position  2) Fam ");
-//                                subm =  getInt();
-//                            }
-//                        while (subm == 1 && subm == 2);
-//
-//                            switch(subm)
-//                            {
-//                                case (1):     // Search by Position             
-//
-//                                    Newlist PoiskPosit = new Newlist();
-//                                    int pos;
-//                                    do
-//                                    {                                 
-//                                        System.out.println ("Enter Position : \n_Chief = 1;\n_Accountant = 2;\n_Engineer = 3;\n_Working = 4;");
-//                                        pos = getInt();
-//                                    }
-//                                    while (pos <1 && pos >4);    
-//
-//                                    PoiskPosit = ListFromFile.foundPos(pos);
-//                                    PoiskPosit.Editedlist();                                        
-//
-//                                break;
-//
-//                                case (2):     // Search By Fam
-//                                    
-//                                    Newlist PoiskFam = new Newlist();
-//                                    System.out.println("Enter fam or beginning of fam :  ");
-//                                    String F = getString();
-//                                    
-//                                    PoiskFam = ListFromFile.foundFam(F);
-//                                    PoiskFam.Editedlist();   
-//                                    
-//                                break;                                    
-//                            }
-//                            
-//                   break;
-//
-//
-//                   case (5):   // Print All 
-//                       
-//                       //<editor-fold defaultstate="collapsed" desc="Old Print All">
-//                       
-//    //                    Iterator<Human> P = Firma.iterator();
-//    //                    while(P.hasNext())
-//    //                        {
-//    //                            Human h = P.next();                        
-//    //                            //h.showHum();
-//    //                            h.arrayHum(h);
-//    //                        }
-//                       //</editor-fold>
-//                       ListFromFile.Editedlist();
-//                   break;
-//
-//                   case (6):
-//                       
-//                        System.out.println("Good Bye !");
-//                        ListFromFile.writeFile();
-//                   break;                
+//                                        System.out.println("Enter Janr Name : ");
+//                                        Janr newjanr  = new Janr(getString());
+//                                        if(Janres.contains(newjanr))
+//                                        {                                 
+//                                            System.out.println(newjanr.getJanr() + " is Exist");
+//                                        }
+//                                        else
+//                                        {
+//                                            Janres.add(newjanr);
+//                                        }
+//                                    break;
+
+                                    case (3):     // Remove Janr
+
+                                        System.out.println("Enter the index of Janr what you want to remove :  ");
+                                        Janres.showAllJanres();
+                                        int r = getInt();
+                                        Janres.remove(r-1);
+                                        System.out.println("New List of Janres : ");
+                                        Janres.showAllJanres();
+                                        
+                                    break;
+                                        
+                                    case (4):     // Replace Janr
+
+                                        Janres.showAllJanres();
+                                        System.out.println("Enter the index of Janr what you want to Replace :  ");
+                                        int rpl = getInt();
+                                        Janres.remove(rpl-1);
+                                        System.out.println("Enter a New Janr : ");
+                                        Janres.add(rpl-1, new Janr(getString()));
+                                    //    
+                                        System.out.println("New List of Janres : ");
+                                        Janres.showAllJanres();
+                                        
+                                    break;
+                                        
+                                    //<editor-fold defaultstate="collapsed" desc="5) Quit to Main Menu">
+                                    case (5):    
+                                        
+                                        System.out.println("Go to MainMenu : ");
+                                                                          
+                                    break; 
+                                        
+//</editor-fold>
+                                                                           
+                                }
+                            }
+                        while (submenu !=5);
+
+                            
+                            
+                   break;
+                       //</editor-fold>
+                    //<editor-fold defaultstate="collapsed" desc="5 : Print All">                       
+
+                   case (5):   //  
+                       
+                        List.showAllFilms();
+                        
+                   break;
+                       //</editor-fold>
+                    //<editor-fold defaultstate="collapsed" desc="6 : Save & Exit">                       
+
+                   case (6):
+                       
+                        System.out.println("Good Bye !");
+                        //List.writeFile();
+                   break;  
+                       //</editor-fold>
             }       
         }
         while(m !=6);
@@ -260,7 +361,7 @@ class Film
     }    
     public void showFilm()
     {
-        System.out.println("Film : " + this.Filmname + " year : " + this.year + "Janr " + j.getJanr());
+        System.out.println(this.Filmname + ", Year : " + this.year + ", Janr : " + j.getJanr() + ".");
     }   
 }
 
@@ -291,6 +392,29 @@ class Janr
     }
     public void showJanr()
     {
-        System.out.println("Janr of Film : " + this.JanrName);
+        System.out.println(this.JanrName);
     }
+}
+
+class JanrCollection extends ArrayList<Janr>
+{
+    JanrCollection()
+    {
+        
+    }
+    
+    public void showAllJanres()
+    {
+        int i = 1;
+        Iterator I = this.iterator();
+            while(I.hasNext())
+            {
+                Janr x =  (Janr) I.next();
+                System.out.print(i + ") ");
+                x.showJanr();
+                i++;
+            }        
+    }
+    
+    
 }
